@@ -1,0 +1,23 @@
+# Set the username and new password
+$username = "UsernameHere"
+$newPassword = "NewPasswordHere"
+
+# Set the domain controller name
+$domainController = "DomainControllerName"
+
+# Get the user distinguished name (DN)
+$userDN = Get-ADUser -Filter "SamAccountName -eq '$username'" | Select-Object -ExpandProperty DistinguishedName
+
+if ($userDN) {
+    try {
+        # Reset the user's password
+        Set-ADAccountPassword -Identity $userDN -Reset -NewPassword (ConvertTo-SecureString -String $newPassword -AsPlainText -Force) -Server $domainController
+
+        Write-Host "Password reset successful for user: $username"
+    } catch {
+        Write-Host "Password reset failed for user: $username"
+        Write-Host "Error: $_"
+    }
+} else {
+    Write-Host "User not found: $username"
+}
